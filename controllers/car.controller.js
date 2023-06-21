@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 const Car = require("../models/Car");
 const { sendResponse, AppError } = require("../helpers/utils");
 const carController = {};
@@ -9,7 +9,7 @@ carController.createCar = async (req, res, next) => {
     const info = req.body;
     if (!info) throw new AppError(401, "Bad Request", "Create car Error");
 
-    const created = await car.create(info);
+    const created = await Car.create(info);
     sendResponse(
       res,
       200,
@@ -27,14 +27,25 @@ carController.createCar = async (req, res, next) => {
 carController.getCars = async (req, res, next) => {
   try {
     // YOUR CODE HERE
+    let { page, limit } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+
+    //Number of items skip for selection
+    let offset = limit * (page - 1);
+
     const filter = req.query;
-    const listOfFound = await Car.find({}).limit(2);
+    let listOfFound = await Car.find({}).skip(offset).limit(10);
+    listOfFound = listOfFound.filter((car) => car.isDeleted === false);
+    const count = Car.countDocuments({});
+    const totalPage = Math.ceil(11914 / limit);
+
     sendResponse(
       res,
       200,
       true,
       "Get Car List Successfully!",
-      { cars: listOfFound, page: 1, total: 11914 },
+      { cars: listOfFound, page: page, total: totalPage },
       null
     );
   } catch (err) {
@@ -46,11 +57,11 @@ carController.getCars = async (req, res, next) => {
 carController.editCar = async (req, res, next) => {
   try {
     // YOUR CODE HERE
-    const targetId = req.body.targetId;
-    const updateInfo = req.body.updateInfo;
+    const targetId = req.params.id;
+    const updateInfo = req.body;
     const options = { new: true };
 
-    const updated = await car.findByIdAndUpdate(targetId, updateInfo, options);
+    const updated = await Car.findByIdAndUpdate(targetId, updateInfo, options);
 
     sendResponse(
       res,
@@ -70,9 +81,10 @@ carController.deleteCar = async (req, res, next) => {
   try {
     // YOUR CODE HERE
     const targetId = req.params.id;
-    const options = { new: true };
+    // const options = { new: true };
 
-    const updated = await car.findByIdAndDelete(targetId, options);
+    // const updated = await Car.findByIdAndDelete(targetId, options);
+    const updated = await Car.findByIdAndUpdate(targetId, { isDeleted: true });
 
     sendResponse(
       res,
