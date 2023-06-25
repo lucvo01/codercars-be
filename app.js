@@ -1,5 +1,3 @@
-const { sendResponse, AppError } = require("./helpers/utils.js");
-
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -17,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-
+const { sendResponse, AppError } = require("./helpers/utils.js");
 const mongoURI = process.env.MONGO_URI;
 // Connect to MONGODB
 mongoose
