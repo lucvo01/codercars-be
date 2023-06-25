@@ -20,6 +20,5 @@ class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
-
-// utilsHelper.AppError = AppError;
-module.exports = { utilsHelper, AppError };
+utilsHelper.AppError = AppError;
+module.exports = utilsHelper;
